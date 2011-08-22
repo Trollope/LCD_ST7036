@@ -14,8 +14,8 @@
 // 
 // @brief Based on the LCD API 1.0 by dale@wentztech.com
 //        This library implements the driver to drive the Newhaven Display
-//        NHD‐C0220BiZ‐FSW‐FBW‐3V3M. The display is build around the ST7036i
-//        i2c LCD controller. 3.3V display.
+//        NHD‐C0220BiZ‐FSW‐FBW‐3V3M. The display is build around the ST7036
+//        i2c LCD controller. This is a 3.3V display.
 //
 // @author F. Malpartida - fmalpartida@gmail.com
 // ---------------------------------------------------------------------------

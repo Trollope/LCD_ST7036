@@ -15,7 +15,16 @@
 // @brief Based on the LCD API 1.0 by dale@wentztech.com
 //        This library implements the driver to drive the Newhaven Display
 //        NHD‐C0220BiZ‐FSW‐FBW‐3V3M. The display is build around the ST7036
-//        i2c controller and is a 3.3V
+//        i2c LCD controller. This is a 3.3V display.
+//        I2C displays based on the ST7032i should also be compatible.
+//
+//        Other compatible displays:
+//           - NHD‐C0220BiZ‐FSW‐FBW‐3V3M
+//           - NHD-C0220BiZ-FS(RGB)-FBW-3VM
+//        Non tested but should be compatible with no or little changes
+//           - NHD-C0216CiZ-FSW-FBW-3V3
+//           - NHD‐C0216CiZ‐FN‐FBW‐3V
+//
 //
 // @author F. Malpartida - fmalpartida@gmail.com
 // ---------------------------------------------------------------------------
@@ -24,7 +33,7 @@
 #include <string.h>			//needed for strlen()
 #include <inttypes.h>
 #include <WConstants.h>		//all things wiring / arduino
-  
+
 #include "LCD_C0220BiZ.h"
 
 // Class private constants and definition 
@@ -66,7 +75,7 @@ const uint8_t BLINK_ON_BIT   = ( 1 << 0 );// Blink selection bit on Display on c
 // Constructors:
 // ---------------------------------------------------------------------------
 LCD_C0220BIZ::LCD_C0220BIZ(uint8_t num_lines = 2, uint8_t num_col = 20, 
-                     uint8_t i2cAddr = 0x78 )
+                           uint8_t i2cAddr = 0x78 )
 {
    _num_lines    = num_lines;
 	_num_col      = num_col;
@@ -75,7 +84,7 @@ LCD_C0220BIZ::LCD_C0220BIZ(uint8_t num_lines = 2, uint8_t num_col = 20,
    _charDelay    = CHAR_DELAY;
    _initialised  = false;
    _backlightPin = -1;
-
+   
 }
 
 LCD_C0220BIZ::LCD_C0220BIZ(uint8_t num_lines, uint8_t num_col, 
@@ -222,7 +231,7 @@ void LCD_C0220BIZ::blink_off()
 void LCD_C0220BIZ::setCursor(uint8_t line_num, uint8_t x)
 {
    uint8_t base = 0x00;
-
+   
    // This display only supports 2 lines for 1 line or 3 line displays
    // a base address will have to be set for such displays
    // ------------------------------------------------------------------
@@ -272,7 +281,7 @@ void LCD_C0220BIZ::load_custom_character (uint8_t char_num, uint8_t *rows)
       if ( _status == 0 )
       {
          write ( rows, PIXEL_ROWS_PER_CHAR ); // write the character to CGRAM 
-      
+         
          // Leave the LCD as it was - function table 1 DDRAM and set the cursor 
          // position to (0, 0) to start writing.
          command ( FUNC_SET_TBL1 );
