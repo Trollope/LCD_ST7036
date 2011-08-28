@@ -16,6 +16,14 @@
 //        This library implements the driver to drive the Newhaven Display
 //        NHD‐C0220BiZ‐FSW‐FBW‐3V3M. The display is build around the ST7036
 //        i2c LCD controller. This is a 3.3V display.
+//        I2C displays based on the ST7632 should also be compatible.
+//
+//        Other compatible displays:
+//           - NHD‐C0220BiZ‐FSW‐FBW‐3V3M
+//           - NHD-C0220BiZ-FS(RGB)-FBW-3VM
+//        Non tested but should be compatible with no or little changes
+//           - NHD-C0216CiZ-FSW-FBW-3V3
+//           - NHD‐C0216CiZ‐FN‐FBW‐3V
 //
 // @author F. Malpartida - fmalpartida@gmail.com
 // ---------------------------------------------------------------------------
@@ -46,7 +54,7 @@ public:
     @param i2cAddr[in]   i2c address of the display
     
     @return None
-
+    
     LCD_C0220BIZ(uint8_t num_lines, uint8_t num_col, uint8_t i2cAddr );
     */
    LCD_C0220BIZ(uint8_t num_lines, uint8_t num_col, uint8_t i2cAddr );
@@ -72,11 +80,11 @@ public:
     @param value[in] Command to be sent to the display
     
     @return None
-
+    
     void command(uint8_t value);
     */
 	void command(uint8_t value);
-
+   
    /**
     Initialise the display. Once created the object, this is the next operation
     that has to be called to initialise the display into a known state. It
@@ -91,7 +99,7 @@ public:
     void init();
     */
 	void init();
-
+   
 	/**
     Set a different delay to that in the library. It may be needed to delay
     sending commands or characters one after the other.
@@ -129,7 +137,7 @@ public:
     @return None
     
     virtual void write(uint8_t, size_t);
-   */
+    */
    virtual void write(const uint8_t *buffer, size_t size);
 	
    /**
@@ -141,7 +149,7 @@ public:
 	
    /**
     Set the cursor to 0,0 
-       
+    
     void home();
     */
 	void home();
@@ -153,21 +161,21 @@ public:
     void on();
     */
 	void on();
-
+   
    /**
     Switch the display off. 
     
     void off();
     */   
 	void off();
-
+   
    /**
     Turn on the cursor "_". 
     
     void cursor_on();
     */
 	void cursor_on();
-
+   
    /**
     Turn off the cursor. This is the default state when the display is
     initialised.
@@ -196,11 +204,11 @@ public:
     initialization is (0,0).
     
     @param Line[in] Line where to put the cursor, range (0, max display lines-1)
-                     This display only take (0, 1)
+    This display only take (0, 1)
     @param Col[in]  Colum where to put the cursor, range (0, max width+1)
     
     @return None
-
+    
     void setCursor(uint8_t Line, uint8_t Col );
     */
 	void setCursor(uint8_t Line, uint8_t Col );
@@ -210,34 +218,34 @@ public:
    // --------------------------------------------------------------------------
 	
 #ifdef _LCDEXPANDED		
-
+   
 	/**
     Provides the state of the LCD. This value is updated every command is sent
     to the LCD or a character or a buffer is writen to the display.
     
     @return 0 OK, 1 if data was too big to be transmitted, 2 NACK on address
     transmission, 3 NACK on data transmission, 4 other error.
-   
+    
     uint8_t status();
     */
 	uint8_t status();
-
+   
    /**
     Load a custom character on the display. After adding a new character to
     the character set, the coordinates are set to (0, 0). This method should
     be called during initialization.
     
-    @param char_num Character to load onto the display, this display supports
+    @param char_num[in] Character to load onto the display, this display supports
     upto 16 user defined characters.
-    @param rows Bitmap defining the character, the display assumes an array
+    @param rows[in] Bitmap defining the character, the display assumes an array
     of 8 bytes per character.
-
+    
     @return None.
     
     uint8_t load_custom_character(uint8_t char_num, uint8_t *rows);
     */
 	void load_custom_character(uint8_t char_num, uint8_t *rows);
-
+   
 	/**
     NOT SUPPORTED
     
@@ -253,7 +261,7 @@ public:
     to a normal GPIO, from 0 to 127 it will be off and from 128 to 255 the 
     backlight will be on. Backlight pin allocation on constructor.
     
-    @param new_val Backlight level of the display. Full range will only be
+    @param new_val[in] Backlight level of the display. Full range will only be
     available on pins with PWM support.
     
     @return None.
@@ -261,20 +269,20 @@ public:
     uint8_t setBacklight();
     */   
 	void setBacklight(uint8_t new_val);
-
+   
    /**
     Sets the LCD contrast level.
     
-    @param new_val The contrast range has been mapped to 16 contrast levels on
-    the display.
+    @param new_val[in] The contrast range (0 to 255) has been mapped to 16 
+    contrast levels on the display.
     
     @return None.
     
     uint8_t setContrast();
     */
 	void setContrast(uint8_t new_val);
-	 
-		
+   
+   
 #endif
 	
 private:
