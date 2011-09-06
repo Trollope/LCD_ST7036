@@ -111,7 +111,6 @@ LCD_C0220BIZ::LCD_C0220BIZ(uint8_t num_lines, uint8_t num_col,
 // ---------------------------------------------------------------------------
 void LCD_C0220BIZ::init () 
 {
-   uint8_t status;
    
    // Initialise the Wire library.
    Wire.begin();
@@ -131,7 +130,7 @@ void LCD_C0220BIZ::init ()
    Wire.send ( 0x06 );  // Entry mode set - increment
    _status = Wire.endTransmission ();
    
-   if ( status == 0 )
+   if ( _status == 0 )
    {
       _initialised = true;
    }
@@ -147,39 +146,54 @@ void LCD_C0220BIZ::setDelay (int cmdDelay,int charDelay)
 
 void LCD_C0220BIZ::command(uint8_t value) 
 {
-   Wire.beginTransmission ( _i2cAddress );
-   Wire.send ( DISP_CMD );
-   Wire.send ( value );
-   _status = Wire.endTransmission ();
-   delay(_cmdDelay);
+   // If the LCD has been initialised correctly, write to it
+   if ( _initialised )
+   {
+      Wire.beginTransmission ( _i2cAddress );
+      Wire.send ( DISP_CMD );
+      Wire.send ( value );
+      _status = Wire.endTransmission ();
+      delay(_cmdDelay);
+   }
 }
 
 
 void LCD_C0220BIZ::write(uint8_t value) 
 {
-   // If it is a new line, set the cursor to the next line (1,0)
-   // ----------------------------------------------------------
-   if ( value == '\n' )
+   // If the LCD has been initialised correctly write to it
+   // -----------------------------------------------------
+   if ( _initialised )
    {
-      setCursor (1,0);
-   }
-   else 
-   {
-      Wire.beginTransmission ( _i2cAddress );
-      Wire.send ( RAM_WRITE_CMD );
-      Wire.send ( value );
-      _status = Wire.endTransmission ();
-      delay(_charDelay);
+      
+      // If it is a new line, set the cursor to the next line (1,0)
+      // ----------------------------------------------------------
+      if ( value == '\n' )
+      {
+         setCursor (1,0);
+      }
+      else
+      {
+         Wire.beginTransmission ( _i2cAddress );
+         Wire.send ( RAM_WRITE_CMD );
+         Wire.send ( value );
+         _status = Wire.endTransmission ();
+         delay(_charDelay);
+      }
    }
 }
 
 void LCD_C0220BIZ::write(const uint8_t *buffer, size_t size)
 {
-   Wire.beginTransmission ( _i2cAddress );
-   Wire.send ( RAM_WRITE_CMD );
-   Wire.send ( (uint8_t *)buffer, size );
-   _status = Wire.endTransmission ();
-   delay(_charDelay);
+   // If the LCD has been initialised correctly, write to it
+   // ------------------------------------------------------
+   if ( _initialised )
+   {
+      Wire.beginTransmission ( _i2cAddress );
+      Wire.send ( RAM_WRITE_CMD );
+      Wire.send ( (uint8_t *)buffer, size );
+      _status = Wire.endTransmission ();
+      delay(_charDelay);
+   }
 }
 
 
@@ -260,32 +274,37 @@ uint8_t LCD_C0220BIZ::keypad ()
 
 void LCD_C0220BIZ::load_custom_character (uint8_t char_num, uint8_t *rows)
 {
-   // If it is a valid place holder for the character, write it into the
-   // display's CGRAM
+   // If the LCD has been initialised correctly start writing to it
    // --------------------------------------------------------------------------
-   if ( char_num < MAX_USER_CHARS )
+   if ( _initialised )
    {
-      // Set up the display to write into CGRAM - configure LCD to use func table 0
-      Wire.beginTransmission ( _i2cAddress );
-      Wire.send ( DISP_CMD );
-      Wire.send ( FUNC_SET_TBL0 ); // Function set: 8 bit, 2 line display 5x8, funct tab 0
-      delay ( _cmdDelay );
-      
-      // Set CGRAM position to write
-      Wire.send ( RAM_WRITE_CMD + (PIXEL_ROWS_PER_CHAR * char_num) ); 
-      _status = Wire.endTransmission ();
-      
-      // If we have changed the function table and configured the CGRAM position
-      // write the new character to the LCD
-      // -----------------------------------------------------------------------
-      if ( _status == 0 )
+      // If it is a valid place holder for the character, write it into the
+      // display's CGRAM
+      // --------------------------------------------------------------------------
+      if ( char_num < MAX_USER_CHARS )
       {
-         write ( rows, PIXEL_ROWS_PER_CHAR ); // write the character to CGRAM 
+         // Set up the display to write into CGRAM - configure LCD to use func table 0
+         Wire.beginTransmission ( _i2cAddress );
+         Wire.send ( DISP_CMD );
+         Wire.send ( FUNC_SET_TBL0 ); // Function set: 8 bit, 2 line display 5x8, funct tab 0
+         delay ( _cmdDelay );
          
-         // Leave the LCD as it was - function table 1 DDRAM and set the cursor 
-         // position to (0, 0) to start writing.
-         command ( FUNC_SET_TBL1 );
-         setCursor ( 0,0 );
+         // Set CGRAM position to write
+         Wire.send ( RAM_WRITE_CMD + (PIXEL_ROWS_PER_CHAR * char_num) ); 
+         _status = Wire.endTransmission ();
+         
+         // If we have changed the function table and configured the CGRAM position
+         // write the new character to the LCD's CGRAM
+         // -----------------------------------------------------------------------
+         if ( _status == 0 )
+         {
+            write ( rows, PIXEL_ROWS_PER_CHAR ); // write the character to CGRAM 
+            
+            // Leave the LCD as it was - function table 1 DDRAM and set the cursor 
+            // position to (0, 0) to start writing.
+            command ( FUNC_SET_TBL1 );
+            setCursor ( 0,0 );
+         }
       }
    }
 }

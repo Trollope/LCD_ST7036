@@ -40,20 +40,21 @@ const uint8_t charBitmap[][8] = {
     @discussion Draws a bargraph on the specified row using barLength characters. 
     @param      value[in] Value to represent in the bargraph
     @param      row[in] Row of the LCD where to display the bargraph. Range (0, 1)
-    for this display.
+                for this display.
     @param      barlength[in] Length of the bar, expressed in display characters.
+    @param      start[in]     Start bar character
+    @param      end [in]      End bar character
 
     @result     None
 */
-static void drawBars ( int value, uint8_t row, uint8_t barLength )
+static void drawBars ( int value, uint8_t row, uint8_t barLength, char start, 
+                       char end )
 {
    int numBars;
 
    // Set initial titles on the display
    lcd.setCursor (row, 0);
-   lcd.print ("L");
-   lcd.setCursor (row, 19 );
-   lcd.print ("H");
+   lcd.print (start);
 
    // Calculate the size of the bar
    value = map ( value, 0, 1024, 0, ( barLength - 1) * CHAR_WIDTH );
@@ -70,6 +71,10 @@ static void drawBars ( int value, uint8_t row, uint8_t barLength )
    // Draw the fractions
    numBars = value % CHAR_WIDTH;
    lcd.print ( char(numBars) );
+   lcd.setCursor (row, barLength + 1);
+   lcd.print ( " " );
+   lcd.print (end);
+
 }
 
 void setup ()
@@ -78,11 +83,11 @@ void setup ()
    int charBitmapSize = (sizeof(charBitmap ) / sizeof (charBitmap[0]));
    
    analogReference ( DEFAULT );
-   pinMode ( LDR_PIN, INPUT ); 
+   pinMode ( LDR_PIN, INPUT );
    lcd.init ();
-   lcd.setContrast(9);
+   lcd.setContrast(10);
   
-   // Load 
+   // Load custom character set into CGRAM
    for ( i = 0; i < charBitmapSize; i++ )
    {
       lcd.load_custom_character ( i, (uint8_t *)charBitmap[i] );
@@ -97,9 +102,9 @@ void loop ()
   lcd.clear ();
   lcd.print ("Light Level:");
   lightLevel = analogRead (LDR_PIN);
-  lcd.setCursor ( 0, 15 );
+  lcd.setCursor ( 1, 16 );
   lcd.print ( lightLevel );  
   lcd.setCursor (1,0);
-  drawBars ( lightLevel, 1, 16 );
+  drawBars ( lightLevel, 1, 12, '-', '+' );
   delay (100);
 }
