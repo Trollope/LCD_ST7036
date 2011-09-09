@@ -1,5 +1,6 @@
 #include <WProgram.h>
 #include <Wire.h>
+#include "ST7036.h"
 #include "LCD_C0220BiZ.h"
 
 // ???:fmalpartida:20110821 
@@ -17,7 +18,15 @@
 */
 #define LDR_PIN     7
 
-LCD_C0220BIZ lcd = LCD_C0220BIZ ( 2, 20, 0x78, 0 );
+
+extern unsigned int __bss_end;
+extern unsigned int __heap_start;
+extern void *__brkval;
+
+
+//LCD_C0220BIZ lcd = LCD_C0220BIZ ( );
+ST7036 lcd = ST7036 ( 2, 20, 0x78 );
+
 
 /*!
     @const      charBitmap 
@@ -33,6 +42,28 @@ const uint8_t charBitmap[][8] = {
    { 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x0 },
    { 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x0 }
 };
+
+/*!
+    @function
+    @abstract   Return available RAM memory
+    @discussion This routine returns the ammount of RAM memory available after
+                initialising the C runtime.
+    @param      
+    @result     Free RAM available.
+*/
+
+static int freeMemory() 
+{
+  int free_memory;
+
+  if((int)__brkval == 0)
+     free_memory = ((int)&free_memory) - ((int)&__bss_end);
+  else
+    free_memory = ((int)&free_memory) - ((int)__brkval);
+
+  return free_memory;
+}
+
 
 /*!
     @function
@@ -82,6 +113,7 @@ void setup ()
    int i; 
    int charBitmapSize = (sizeof(charBitmap ) / sizeof (charBitmap[0]));
    
+   Serial.begin ( 57600 );
    analogReference ( DEFAULT );
    pinMode ( LDR_PIN, INPUT );
    lcd.init ();
@@ -92,6 +124,7 @@ void setup ()
    {
       lcd.load_custom_character ( i, (uint8_t *)charBitmap[i] );
    }
+   Serial.println ( freeMemory () );
 }
 
 
