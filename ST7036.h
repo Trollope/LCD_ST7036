@@ -32,14 +32,14 @@
 
 
 #define _LCDEXPANDED				// If defined turn on advanced functions
-#include <WConstants.h>	
+#include <Arduino.h>	
 #include <inttypes.h>
 #include <Wire.h>
 #include "Print.h"
 #include "LCD.h"
 
 
-#define _ST7036_VERSION       "1.0"
+#define _ST7036_VERSION       "1.1"
 #define _LCD_API_VERSION      "1.0"
 
 class ST7036 : public Print 
@@ -125,7 +125,7 @@ public:
     
     virtual void write(uint8_t);
     */
-	virtual void write(uint8_t);
+	virtual size_t write(uint8_t);
    
    /**
     This is the write method used by the Print library. It allows printing
@@ -139,7 +139,7 @@ public:
     
     virtual void write(uint8_t, size_t);
     */
-   virtual void write(const uint8_t *buffer, size_t size);
+   virtual size_t write(const uint8_t *buffer, size_t size);
 	
    /**
     Clear the display and set the cursor to 0,0

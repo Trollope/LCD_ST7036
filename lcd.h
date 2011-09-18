@@ -21,7 +21,7 @@
 
 #ifndef LCD_h
 #define LCD_h
-#include "WConstants.h"
+#include "Arduino.h"
 #include "Print.h"
 
 
@@ -84,7 +84,7 @@ public:
     
     virtual void write(uint8_t);
     */
-	virtual void write(uint8_t) = 0;
+	virtual size_t write(uint8_t) = 0;
    
    /**
     This is the write method used by the Print library. It allows printing
@@ -98,7 +98,7 @@ public:
     
     virtual void write(uint8_t, size_t);
     */
-   virtual void write(const uint8_t *buffer, size_t size) = 0;
+   virtual size_t write(const uint8_t *buffer, size_t size) = 0;
 	
    /**
     Clear the display and set the cursor to 0,0
