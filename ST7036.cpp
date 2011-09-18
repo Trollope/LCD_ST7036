@@ -27,8 +27,7 @@
 //
 // @author F. Malpartida - fmalpartida@gmail.com
 // ---------------------------------------------------------------------------
-#include <WProgram.h>
-#include <WConstants.h>		//all things wiring / arduino
+#include <Arduino.h>		//all things wiring / arduino
 #include <Wire.h>
 #include <string.h>			//needed for strlen()
 #include <inttypes.h>
@@ -118,23 +117,23 @@ ST7036::ST7036(uint8_t num_lines, uint8_t num_col,
 // ---------------------------------------------------------------------------
 void ST7036::init () 
 {
-   
+   size_t retVal; 
    // Initialise the Wire library.
    Wire.begin();
    
    Wire.beginTransmission ( _i2cAddress );
-   Wire.send ( 0x0 );   // Send command to the display
-   Wire.send ( FUNC_SET_TBL0 );
+   Wire.write ( (byte)0x0 );   // Send command to the display
+   Wire.write ( FUNC_SET_TBL0 );
    delay (10);
-   Wire.send ( FUNC_SET_TBL1 );
+   Wire.write ( FUNC_SET_TBL1 );
    delay (10);
-   Wire.send ( 0x14 );  // Set BIAS - 1/5
-   Wire.send ( 0x73 );  // Set contrast low byte
-   Wire.send ( 0x5E );  // ICON disp on, Booster on, Contrast high byte 
-   Wire.send ( 0x6D );  // Follower circuit (internal), amp ratio (6)
-   Wire.send ( 0x0C );  // Display on
-   Wire.send ( 0x01 );  // Clear display
-   Wire.send ( 0x06 );  // Entry mode set - increment
+   Wire.write ( 0x14 );  // Set BIAS - 1/5
+   Wire.write ( 0x73 );  // Set contrast low byte
+   Wire.write ( 0x5E );  // ICON disp on, Booster on, Contrast high byte 
+   Wire.write ( 0x6D );  // Follower circuit (internal), amp ratio (6)
+   Wire.write ( 0x0C );  // Display on
+   Wire.write ( 0x01 );  // Clear display
+   Wire.write ( 0x06 );  // Entry mode set - increment
    _status = Wire.endTransmission ();
    
    if ( _status == 0 )
@@ -157,15 +156,15 @@ void ST7036::command(uint8_t value)
    if ( _initialised )
    {
       Wire.beginTransmission ( _i2cAddress );
-      Wire.send ( DISP_CMD );
-      Wire.send ( value );
+      Wire.write ( DISP_CMD );
+      Wire.write ( value );
       _status = Wire.endTransmission ();
       delay(_cmdDelay);
    }
 }
 
 
-void ST7036::write(uint8_t value) 
+size_t ST7036::write(uint8_t value) 
 {
    // If the LCD has been initialised correctly write to it
    // -----------------------------------------------------
@@ -181,23 +180,23 @@ void ST7036::write(uint8_t value)
       else
       {
          Wire.beginTransmission ( _i2cAddress );
-         Wire.send ( RAM_WRITE_CMD );
-         Wire.send ( value );
+         Wire.write ( RAM_WRITE_CMD );
+         Wire.write ( value );
          _status = Wire.endTransmission ();
          delay(_charDelay);
       }
    }
 }
 
-void ST7036::write(const uint8_t *buffer, size_t size)
+size_t ST7036::write(const uint8_t *buffer, size_t size)
 {
    // If the LCD has been initialised correctly, write to it
    // ------------------------------------------------------
    if ( _initialised )
    {
       Wire.beginTransmission ( _i2cAddress );
-      Wire.send ( RAM_WRITE_CMD );
-      Wire.send ( (uint8_t *)buffer, size );
+      Wire.write ( RAM_WRITE_CMD );
+      Wire.write ( (uint8_t *)buffer, size );
       _status = Wire.endTransmission ();
       delay(_charDelay);
    }
@@ -292,12 +291,12 @@ void ST7036::load_custom_character (uint8_t char_num, uint8_t *rows)
       {
          // Set up the display to write into CGRAM - configure LCD to use func table 0
          Wire.beginTransmission ( _i2cAddress );
-         Wire.send ( DISP_CMD );
-         Wire.send ( FUNC_SET_TBL0 ); // Function set: 8 bit, 2 line display 5x8, funct tab 0
+         Wire.write ( DISP_CMD );
+         Wire.write ( FUNC_SET_TBL0 ); // Function set: 8 bit, 2 line display 5x8, funct tab 0
          delay ( _cmdDelay );
          
          // Set CGRAM position to write
-         Wire.send ( RAM_WRITE_CMD + (PIXEL_ROWS_PER_CHAR * char_num) ); 
+         Wire.write ( RAM_WRITE_CMD + (PIXEL_ROWS_PER_CHAR * char_num) ); 
          _status = Wire.endTransmission ();
          
          // If we have changed the function table and configured the CGRAM position

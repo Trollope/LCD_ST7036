@@ -33,10 +33,10 @@
 
 #define _LCDEXPANDED				// If defined turn on advanced functions
 
-#include <WConstants.h>
+#include <Arduino.h>
 #include "ST7036.h"
 
-#define _LCD_C0220BIZ_VERSION "1.0"
+#define _LCD_C0220BIZ_VERSION "1.1"
 #define _LCD_API_VERSION      "1.0"
 
 class LCD_C0220BIZ : public ST7036
