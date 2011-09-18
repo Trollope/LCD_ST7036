@@ -28,7 +28,6 @@
 //
 // @author F. Malpartida - fmalpartida@gmail.com
 // ---------------------------------------------------------------------------
-//#include <Arduino.h>		//all things wiring / arduino
 #include "LCD_C0220BiZ.h"
 
 // Class private constants and definition 
