@@ -23,8 +23,9 @@
     @abstract   Temperature calibration offset.
     @discussion This is the offset value that has to be modified to get a
                 correct temperature reading from the internal temperature sensor
+                of your AVR.
 */
-#define TEMP_CAL_OFFSET 329
+#define TEMP_CAL_OFFSET 335
 
 /*!
     @defined    FILTER_ALP
@@ -33,7 +34,7 @@
                 the over all value. The smaller, the less influence the current
                 reading has over the overall result.
 */
-#define FILTER_ALP 0.01
+#define FILTER_ALP 0.1
 
 extern unsigned int __bss_end;
 extern unsigned int __heap_start;
@@ -93,10 +94,10 @@ static int freeMemory()
 static int readTemperature()
 {
    ADMUX = 0xC8;                          // activate interal temperature sensor, 
-                                          //using 1.1V ref. voltage
+                                          // using 1.1V ref. voltage
    ADCSRA |= _BV(ADSC);                   // start the conversion
    while (bit_is_set(ADCSRA, ADSC));      // ADSC is cleared when the conversion 
-                                          //finishes
+                                          // finishes
                                           
    // combine bytes & correct for temperature offset (approximate)
    return ( (ADCL | (ADCH << 8)) - TEMP_CAL_OFFSET);  
@@ -127,6 +128,12 @@ static void drawBars ( int value, uint8_t row, uint8_t barLength, char start,
    // Calculate the size of the bar
    value = map ( value, -20, 50, 0, ( barLength - 1) * CHAR_WIDTH );
    numBars = value / CHAR_WIDTH;
+   
+   // Limit the size of the bargraph to barLength
+   if ( numBars > barLength )
+   {
+     numBars = barLength;
+   }
 
    lcd.setCursor ( row,2 );
    
@@ -174,6 +181,7 @@ void loop ()
   tempFilter = ( FILTER_ALP * temp) + (( 1.0 - FILTER_ALP ) * tempFilter);
 
   lcd.clear ();
+  lcd.setCursor ( 0, 0 );
   lcd.print ("Temperature:");
   lcd.setCursor ( 1, 15 );
   lcd.print ( tempFilter, 1 );  
