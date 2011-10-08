@@ -140,7 +140,7 @@ static void drawBars ( int value, uint8_t row, uint8_t barLength, char start,
    // Draw the bars
    while ( numBars-- )
    {
-      lcd.print ( char( (sizeof(charBitmap ) / sizeof(charBitmap[0])) - 1 ) );
+      lcd.print ( char( 5 ) );
    }
    
    // Draw the fractions
