@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "ST7036.h"
-#include "LCD_C0220BiZ.h"
 #include <Wire.h>
 
 // ???:fmalpartida:20110821 
